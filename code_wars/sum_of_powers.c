@@ -3,28 +3,11 @@
 #include <stdlib.h> // atoi
 #include <math.h> // pow
 
-unsigned eq_sum_powedig(const unsigned, const unsigned);
-
-int main(int argc, char** argv)
-{
-
-  int max_val = atoi(argv[1]);
-  int expo = atoi(argv[2]);
-  printf("max_val: %d\n", max_val);
-  printf("expo: %d\n\n", expo);
-
-  for (int value = 2; value <= max_val; value++){
-    eq_sum_powedig(value, expo);
-  }
-  return 0;
-
-}
-
 unsigned eq_sum_powedig(const unsigned h_max, const unsigned expo)
 {
   // 110 / 10 = 11 % 10 = 1
-  int i=h_max;
-  int out=0;
+  unsigned i=h_max;
+  unsigned out=0;
   int j;
   while ( i > 0 ) {
     j = i % 10;
@@ -32,8 +15,29 @@ unsigned eq_sum_powedig(const unsigned h_max, const unsigned expo)
     i /= 10;
 
   }
-
-  if (out == h_max) {
-    printf("%d\n", out);
-  }
+  return out;
 }
+
+int main(int argc, char** argv)
+{
+
+  int max_val = atoi(argv[1]);
+  int expo = atoi(argv[2]);
+
+  printf("max_val: %d\n", max_val);
+  printf("expo: %d\n\n", expo);
+
+  unsigned out;
+
+  for (int value = 2; value <= max_val; value++){
+    out = eq_sum_powedig(value, expo);
+
+    if (out == value)
+      printf("%d\n", out);
+
+  }
+
+  return 0;
+
+}
+
