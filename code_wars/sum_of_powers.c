@@ -5,17 +5,18 @@
 
 unsigned eq_sum_powedig(const unsigned, const unsigned);
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 
   int max_val = atoi(argv[1]);
   int expo = atoi(argv[2]);
-  printf("max_val %d\n", max_val);
-  printf("expo %d\n\n", expo);
+  printf("max_val: %d\n", max_val);
+  printf("expo: %d\n\n", expo);
 
   for (int value = 2; value <= max_val; value++){
     eq_sum_powedig(value, expo);
   }
+  return 0;
 
 }
 
@@ -35,5 +36,4 @@ unsigned eq_sum_powedig(const unsigned h_max, const unsigned expo)
   if (out == h_max) {
     printf("%d\n", out);
   }
-  return 0;
 }
