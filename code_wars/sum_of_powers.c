@@ -21,19 +21,29 @@ unsigned eq_sum_powedig(const unsigned h_max, const unsigned expo)
 int main(int argc, char** argv)
 {
 
-  int max_val = atoi(argv[1]);
+  size_t max_val = atoi(argv[1]);
   int expo = atoi(argv[2]);
 
-  printf("max_val: %d\n", max_val);
+  printf("max_val: %zu\n", max_val);
   printf("expo: %d\n\n", expo);
 
-  unsigned out;
+  unsigned short len_of_value=0;
+  unsigned long c=max_val;
+  while ( c > 0) {
+    len_of_value++;
+    c /= 10;
+  }
 
-  for (int value = 2; value <= max_val; value++){
+  printf("len_of_value: %u\n", len_of_value);
+  size_t upper_limit = pow(9, expo) * len_of_value;
+  printf("upper_imit: %zu\n\n", upper_limit);
+  size_t out;
+
+  for (int value = 2; value <= upper_limit; value++){
     out = eq_sum_powedig(value, expo);
 
     if (out == value)
-      printf("%d\n", out);
+      printf("%zu\n", out);
 
   }
 
