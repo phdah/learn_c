@@ -18,26 +18,25 @@ int main(int argc, char** argv)
   int k=0;
   int duplicate=0;
 
-  while ( fgets(str, 5000, ptr) != NULL ) {
-    while ( str[i] != '\n' ) {
-      if ( i > (n-2) ) {
-        for ( int j=0; j < n; j++ ) {
-          check[str[i-j]-97] += str[i-j]-97 + m;
-        }
-        for ( int j=0; j < n; j++ ) {
-          if ( check[str[i-j]-97] > m*2 ) {
-            ++duplicate;
-          }
-          check[str[i-j]-97]=0;
-        }
-        if ( !duplicate ) {
-          printf("Found %d unique values after: %d\n", n, i+1);
-          return 0;
-        }
-        duplicate=0;
+  fgets(str, 5000, ptr);
+  while ( str[i] != '\n' ) {
+    if ( i > (n-2) ) {
+      for ( int j=0; j < n; j++ ) {
+        check[str[i-j]-97] += 1;
       }
-      ++i;
+      for ( int j=0; j < n; j++ ) {
+        if ( check[str[i-j]-97] > 1 ) {
+          duplicate=1;
+        }
+        check[str[i-j]-97]=0;
+      }
+      if ( !duplicate ) {
+        printf("Found %d unique values after: %d\n", n, i+1);
+        return 0;
+      }
+      duplicate=0;
     }
+    ++i;
   }
 
 
