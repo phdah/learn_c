@@ -27,10 +27,22 @@ int recursiveSum(TreeNode* _ptr, int* sum)
     dir_sum += recursiveSum(_ptr->child[child_index++], sum);
   }
   output_sum = _ptr->sum + dir_sum;
-  if ( output_sum <= 100000 ) {
-    *sum += output_sum;
-  }
+  *sum += output_sum;
+  _ptr->sum=output_sum;
   return output_sum;
+}
+
+void findDeleteDir(TreeNode* _ptr, int* delete_sum, int* dir_sum, char dir_name[dir_l])
+{
+  int child_index=0;
+
+  while ( _ptr->child_name[child_index][0] ) {
+    findDeleteDir(_ptr->child[child_index++], delete_sum, dir_sum, dir_name);
+  }
+  if ( _ptr->sum >= *delete_sum && _ptr->sum < *dir_sum ) {
+    *dir_sum = _ptr->sum;
+    memcpy(dir_name, _ptr->name, dir_l);
+  }
 }
 
 void recursiveFree(TreeNode* _ptr)
@@ -80,6 +92,9 @@ int main(int argc, char** argv)
   char str[100];
 
   int final_sum=0;
+  int delete_sum;
+  int delete_size=70000000;
+  char delete_dir[dir_l];
 
   //** tree **//
   TreeNode* root_node = createTreeNode("/");
@@ -165,11 +180,15 @@ int main(int argc, char** argv)
   }
   fclose(ptr);
 
+  // calculate dir sums
   recursiveSum(root_node, &final_sum);
-  printf("%d\n", final_sum);
 
-  // free all ptrs
+  // find required storage and min/max dir to delete
+  delete_sum = 30000000 + root_node->sum - 70000000;
+  findDeleteDir(root_node, &delete_sum, &delete_size, delete_dir);
+  printf("%d\n", delete_size);
+
+  // free all ptr
   recursiveFree(root_node);
-
   return 0;
 }
