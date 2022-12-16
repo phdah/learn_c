@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define str_l 10
-#define map_mid 10
+#define str_l 20
+#define map_mid 12000
 
 typedef struct BridgePoint {
     unsigned int x;
     unsigned int y;
 } BridgePoint;
 
-void checkNewPosition(int map[map_mid*2][map_mid*2], int* visited, unsigned int x, unsigned int y)
+void checkNewPosition(int** map, int* visited, unsigned int x, unsigned int y)
 {
     if ( map[x][y] == 0 ) {
         map[x][y]=1;
@@ -43,7 +43,7 @@ void moveHead(BridgePoint* point, BridgePoint* old_point, char dir)
 
 }
 
-void checkTail(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* head, BridgePoint* old_head, BridgePoint* tail, char dir)
+void checkTail(int** map, int* visited, BridgePoint* head, BridgePoint* old_head, BridgePoint* tail, char dir)
 {
     // check distance to head
     int head_x = head->x;
@@ -83,7 +83,10 @@ int main(int argc, char** argv)
 
     // initialize visited sum and map
     int visited=1;
-    int map[map_mid*2][map_mid*2]={{0}};
+    int** map=(int**)calloc(map_mid*2, sizeof(int));
+    for ( int i=0; i < map_mid*2; i++ )
+        map[i]=(int*)calloc(map_mid*2, sizeof(int));
+    //int map[map_mid*2][map_mid*2]={{0}};
     map[map_mid][map_mid]=1;
 
     // initialize head and tail position
@@ -121,15 +124,12 @@ int main(int argc, char** argv)
 //    }
             --moves;
         }
+        digit=0;
+        while ( str[digit] != '\n' ) {
+            moves_char[digit] = 0;
+            ++digit;
+        }
 
-
-    }
-
-
-    digit=0;
-    while ( str[digit] != '\n' ) {
-        moves_char[digit] = 0;
-        ++digit;
     }
 
     printf("%d\n", visited);
