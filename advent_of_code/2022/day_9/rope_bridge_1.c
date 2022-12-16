@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define str_l 20
+#define str_l 10
 #define map_mid 10
 
 typedef struct BridgePoint {
@@ -10,17 +10,21 @@ typedef struct BridgePoint {
     unsigned int y;
 } BridgePoint;
 
-void checkNewPosition(int map[map_mid*2][map_mid*2], int* visited, unsigned int* x, unsigned int* y)
+void checkNewPosition(int map[map_mid*2][map_mid*2], int* visited, unsigned int x, unsigned int y)
 {
-    if ( map[*x][*y] == 0 ) {
-        map[*x][*y]=1;
+    if ( map[x][y] == 0 ) {
+        map[x][y]=1;
         ++*visited;
     }
 }
 
 
-void movePoint(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* point, char dir, char part)
+void moveHead(BridgePoint* point, BridgePoint* old_point, char dir)
 {
+    // save old state
+    old_point->x=point->x;
+    old_point->y=point->y;
+
     // y: up and down
     if ( dir=='U' ) {
         ++point->y;
@@ -37,12 +41,9 @@ void movePoint(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* point, 
         --point->x;
     }
 
-    if ( part == 'T' ) {
-        checkNewPosition(map, visited, &point->x, &point->y);
-    }
 }
 
-void checkTail(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* head, BridgePoint* tail, char dir)
+void checkTail(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* head, BridgePoint* old_head, BridgePoint* tail, char dir)
 {
     // check distance to head
     int head_x = head->x;
@@ -51,11 +52,22 @@ void checkTail(int map[map_mid*2][map_mid*2], int* visited, BridgePoint* head, B
     int tail_y = tail->y;
 
     int dist = abs(head_x - tail_x) + abs(head_y - tail_y);
+    int dist_x = abs(head_x - tail_x);
+    int dist_y = abs(head_y - tail_y);
     //printf("dist %d\n ", dist);
 
     // move tail
     if ( dist > 1 ) {
-        movePoint(map, visited, tail, dir, 'T');
+        if ( dist > 2 && dist_x > 0 && dist_y > 0 ) {
+            tail->x=old_head->x;
+            tail->y=old_head->y;
+            checkNewPosition(map, visited, tail->x, tail->y);
+        }
+        else if ( ( dist_x > 0) != ( dist_y > 0 ) ) {
+            tail->x=old_head->x;
+            tail->y=old_head->y;
+            checkNewPosition(map, visited, tail->x, tail->y);
+        }
     }
 
 }
@@ -75,14 +87,13 @@ int main(int argc, char** argv)
     map[map_mid][map_mid]=1;
 
     // initialize head and tail position
-    BridgePoint posHead;// = (BridgePoint*)malloc(sizeof(BridgePoint));
+    BridgePoint posHead;
     posHead.x = map_mid;
     posHead.y = map_mid;
 
     BridgePoint old_posHead=posHead;
-    printf("Original head: x=%d, y=%d", old_posHead.x, old_posHead.y);
 
-    BridgePoint posTail;// = (BridgePoint*)malloc(sizeof(BridgePoint));
+    BridgePoint posTail;
     posTail.x = map_mid;
     posTail.y = map_mid;
 
@@ -97,31 +108,23 @@ int main(int argc, char** argv)
         }
         moves = atoi(moves_char);
 
-        printf("\nDir: %c, Moves: %d\n", direction, moves);
-        printf("    Head: x=%d, y=%d\n", posHead.x, posHead.y);
-        printf("    Tail: x=%d, y=%d\n", posTail.x, posTail.y);
-
         while ( moves > 0 ) {
-            movePoint(map, &visited, &posHead, direction, 'H');
+            moveHead(&posHead, &old_posHead, direction);
 
-            printf("    Head: x=%d, y=%d\n", posHead.x, posHead.y);
+            checkTail(map, &visited, &posHead, &old_posHead, &posTail, direction);
 
-            checkTail(map, &visited, &posHead, &posTail, direction);
-
-            printf("    Tail: x=%d, y=%d\n", posTail.x, posTail.y);
-            printf("Visited: %d\n", visited);
-
+//    for ( int y=14; y > 9; y-- ) {
+//        for ( int x=10; x < 16; x++ ) {
+//        printf("%d", map[x][y]);
+//        }
+//        printf("\n");
+//    }
             --moves;
         }
 
+
     }
-    printf("Original head: x=%d, y=%d", old_posHead.x, old_posHead.y);
-    for ( int y=14; y > 9; y-- ) {
-        for ( int x=10; x < 16; x++ ) {
-        printf("%d", map[x][y]);
-        }
-        printf("\n");
-    }
+
 
     digit=0;
     while ( str[digit] != '\n' ) {
@@ -129,6 +132,7 @@ int main(int argc, char** argv)
         ++digit;
     }
 
+    printf("%d\n", visited);
     fclose(ptr);
     return 0;
 }
