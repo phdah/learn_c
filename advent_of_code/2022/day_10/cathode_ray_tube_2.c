@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "tube.h"
-
 #define str_l 10
+#define cycle_tick 40
 
 int main(int argc, char** argv)
 {
@@ -14,67 +13,75 @@ int main(int argc, char** argv)
     char str[str_l];
 
     // define main objects
-    int total_signal=0;
     int prev_iterative_signal=1;
     int iterative_signal=1;
 
+    unsigned short pixle=0;
+
     unsigned int cycle=0;
-    unsigned int iterative_cycle=0;
-    unsigned short first_run=0;
+    unsigned short input_cycle;
 
     char x_char[str_l]={0};
     unsigned short c;
-    int x;
 
     while ( fgets(str, str_l, ptr) != NULL ) {
-        //printf("%s", str);
+        // if addx
         if ( str[0] == 'a' ) {
             c=0;
             while ( str[5+c] != '\n') {
                 x_char[c] = str[5+c];
                 ++c;
             }
+            // update signal strength
             iterative_signal += atoi(x_char);
+            // reset char buffer
             memset(x_char, 0, sizeof(x_char));
-            iterative_cycle += 2;
-            cycle += 2;
+
+            // loops over two cycles
+            input_cycle=0;
+            while ( input_cycle < 2 ) {
+                // check if pixle is within window of 3
+                if ( abs(prev_iterative_signal - pixle) < 2 ) {
+                    ++pixle;
+                    printf("#");
+                }
+                else {
+                    ++pixle;
+                    printf(".");
+                }
+                ++cycle;
+                ++input_cycle;
+                // switch row if reaching cycles of 40
+                if ( (cycle % cycle_tick) == 0 ) {
+                    printf("\n");
+                    pixle=0;
+                }
+            }
+
         }
+        // if noop
         else {
-            iterative_cycle += 1;
-            cycle += 1;
-        }
-
-        if (  iterative_cycle >= 40 || ( cycle >= 20 && !first_run ) ) {
-            total_signal += prev_iterative_signal * ( (cycle / 10) * 10);
-            //printf("cycle %d, flat %d\n", cycle, (cycle / 10) * 10 );
-            //printf("Cycle: %d, iterative cycle: %d, iterative signal: %d, total signal: %d\n", cycle, iterative_cycle, prev_iterative_signal * ( (cycle / 10) * 10), total_signal);
-            if ( iterative_cycle >= 40 ) {
-                iterative_cycle -= 40;
+            // check if pixle is within window of 3
+            if ( abs(prev_iterative_signal - pixle) < 2 ) {
+                ++pixle;
+                printf("#");
             }
             else {
-                iterative_cycle -= 20;
+                ++pixle;
+                printf(".");
             }
-            ++first_run;
-        }
-        else if (iterative_cycle == 40 || ( cycle == 20 && !first_run ) ) {
-            total_signal += iterative_signal * ( (cycle / 10) * 10);
-            //printf("cycle %d, flat %d\n", cycle, (cycle / 10) * 10 );
-            //printf("Cycle: %d, iterative cycle: %d, iterative signal: %d, total signal: %d\n", cycle, iterative_cycle, iterative_signal * ( (cycle / 10) * 10), total_signal);
-            if ( iterative_cycle >= 40 ) {
-                iterative_cycle -= 40;
+            ++cycle;
+            // switch row if reaching cycles of 40
+            if ( (cycle % cycle_tick) == 0 ) {
+                printf("\n");
+                pixle=0;
             }
-            else {
-                iterative_cycle -= 20;
-            }
-            ++first_run;
         }
 
+        // update previous signal strength after cycles
         prev_iterative_signal = iterative_signal;
 
     }
-
-    printf("%d\n", total_signal);
-
 
     fclose(ptr);
     return 0;
